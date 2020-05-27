@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
             Route::get('logout','UserController@logout');
             Route::put('update', 'UserController@updateUser');
             Route::delete('delete', 'UserController@deleteUser');
+            Route::post('upload','UserController@uploadImage');
         });
     });
 });

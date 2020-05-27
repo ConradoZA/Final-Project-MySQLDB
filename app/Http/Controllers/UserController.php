@@ -128,4 +128,25 @@ class UserController extends Controller
             ], 500);
         }
     }
+    public function uploadImage(Request $request)
+    {
+        try {
+
+            //ToDo: averiguar lo de que se esperaba un objeto y obtiene un array y CÓMO SOLUCIONARLO
+            $request->validate([
+                'image' => 'required|image|max:2048|unique:users,image_path'
+            ]);
+            $body = $request->only('image');
+            $file = $body->file('image');
+            $image_name = $file->getClientOriginalName();
+            $file->move('images', $image_name);
+            $user = Auth::user();
+            $user['image_path']->update($image_name);
+        } catch (\Exception $e) {
+            return response([
+                'message' => 'No se pudo subir la imagen',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
