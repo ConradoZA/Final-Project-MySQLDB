@@ -69,10 +69,7 @@ class UserController extends Controller
                 'message' => 'Usuario desconectado'
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al desconectarse',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al desconectarse');
         }
     }
     public function updateUser(Request $request)
@@ -95,10 +92,7 @@ class UserController extends Controller
                 'message' => 'Datos del usuario actualizados',
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al actualizar los datos',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al actualizar los datos');
         }
     }
     public function deleteUser(Request $request)
@@ -114,10 +108,7 @@ class UserController extends Controller
                 'message' => 'Usuario borrado con éxito',
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo borrar el usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo borrar el usuario');
         }
     }
     public function getProfile(Request $request)
@@ -128,10 +119,7 @@ class UserController extends Controller
                 'user' => $user
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo acceder al usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo acceder al usuario');
         }
     }
     public function uploadImage(Request $request)
@@ -151,10 +139,7 @@ class UserController extends Controller
                 'message' => 'Imagen subida con éxito'
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo subir la imagen',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo subir la imagen');
         }
     }
     public function sendConfirmEmail()
@@ -167,10 +152,7 @@ class UserController extends Controller
                 'message' => 'Email enviado'
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo enviar el mail',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
         }
     }
     public function emalConfirmed()
@@ -183,10 +165,7 @@ class UserController extends Controller
                 'message' => 'Email verificado'
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo verificar el mail',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo verificar el mail');
         }
     }
     public function sendRecoverPasswordEmail(Request $request)
@@ -196,10 +175,7 @@ class UserController extends Controller
             $link = $this->FRONT_URI . '/' . Auth::token();
             Mail::to(Auth::email())->send(new ConfirmEmail($link));
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo enviar el mail',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
         }
     }
 }
