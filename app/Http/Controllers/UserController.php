@@ -2,39 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ConfirmEmail;
+use App\Mail\RecoverPassword;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
+    public $FRONT_URI;
+    public function __construct()
+    {
+        $this->FRONT_URI = env('FRONT_URI', 'https:');
+    }
+    private function ERROR_MESSAGE($e, $message)
+    {
+        return response([
+            'message' => $message,
+            'error' => $e->getMessage()
+        ], 500);
+    }
     public function register(Request $request)
     {
         try {
             $request->validate([
                 'name' => 'required|string|max:20',
                 'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/g')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
             $user = User::create($body);
             return response($user, 201);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al crear el usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al crear el usuario');
         }
     }
     public function login(Request $request)
     {
         try {
             $request->validate([
-                'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/g')
+                'email' => 'required|email',
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
             ]);
             $credentials = $request->only(['email', 'password']);
             if (!Auth::attempt($credentials)) {
@@ -45,15 +57,9 @@ class UserController extends Controller
             $user = Auth::user();
             $token = $user->createToken('authToken')->accessToken;
             $user->token = $token;
-            return response([
-                'user' => $user,
-                'token' => $token
-            ]);
+            return response($user);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al conectarse',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al conectarse');
         }
     }
     public function logout()
@@ -64,24 +70,22 @@ class UserController extends Controller
                 'message' => 'Usuario desconectado'
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al desconectarse',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al desconectarse');
         }
     }
     public function updateUser(Request $request)
     {
-        //ToDo: Confirmar que si no hay password no tira excepción
         try {
             $request->validate([
                 'name' => 'string|max:20',
                 'email' => 'email|unique:users',
-                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/g'),
+                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/'),
                 'image_path' => 'string'
             ]);
             $body = $request->only(['name', 'email', 'password', 'image_path']);
-            $body['password'] = Hash::make($body['password']);
+            if ($body['password']) {
+                $body['password'] = Hash::make($body['password']);
+            }
             $user = Auth::user();
             $user->update($body);
             return response([
@@ -89,10 +93,7 @@ class UserController extends Controller
                 'message' => 'Datos del usuario actualizados',
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Hubo un error al actualizar los datos',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'Hubo un error al actualizar los datos');
         }
     }
     public function deleteUser(Request $request)
@@ -100,7 +101,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:20',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/g')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
             ]);
             $user = Auth::user();
             $user->delete;
@@ -108,13 +109,10 @@ class UserController extends Controller
                 'message' => 'Usuario borrado con éxito',
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo borrar el usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo borrar el usuario');
         }
     }
-    public function getProfile(Request $request)
+    public function getProfile()
     {
         try {
             $user = Auth::user();
@@ -122,31 +120,77 @@ class UserController extends Controller
                 'user' => $user
             ]);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'No se pudo acceder al usuario',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->ERROR_MESSAGE($e, 'No se pudo acceder al usuario');
         }
     }
     public function uploadImage(Request $request)
     {
         try {
 
-            //ToDo: averiguar lo de que se esperaba un objeto y obtiene un array y CÓMO SOLUCIONARLO
             $request->validate([
                 'image' => 'required|image|max:2048|unique:users,image_path'
             ]);
-            $body = $request->only('image');
-            $file = $body->file('image');
+            $file = $request->file('image');
             $image_name = $file->getClientOriginalName();
             $file->move('images', $image_name);
             $user = Auth::user();
-            $user['image_path']->update($image_name);
-        } catch (\Exception $e) {
+            $user->update(['image_path' => $image_name]);
             return response([
-                'message' => 'No se pudo subir la imagen',
-                'error' => $e->getMessage()
-            ], 500);
+                'user' => $user,
+                'message' => 'Imagen subida con éxito'
+            ]);
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e, 'No se pudo subir la imagen');
+        }
+    }
+    public function sendConfirmEmail()
+    {
+        try {
+            $token = Auth::user()->token()->get();
+            $token = $token[0]->id;
+            //ToDo: poner bien la dirección total del componente de confirmar contraseña
+            $link = $this->FRONT_URI . '/' . $token;
+            Mail::to(Auth::user()->email)->send(new ConfirmEmail($link));
+            return response([
+                'message' => 'Email enviado'
+            ]);
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
+        }
+    }
+    public function emalConfirmed()
+    {
+        try {
+            $user = Auth::user();
+            $user->update(['email_verified' => true]);
+            return response([
+                'user' => $user,
+                'message' => 'Email verificado'
+            ]);
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e, 'No se pudo verificar el mail');
+        }
+    }
+    public function sendRecoverPasswordEmail(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'string|max:20',
+                'email' => 'email'
+            ]);
+            $body = $request->only(['name', 'email']);
+            $user = DB::table('users')->where([['name', $body['name']], ['email', $body['email']]])->get();
+            $token = DB::table('oauth_access_tokens')->where('user_id', $user[0]->id)->get();
+            $token = $token[0]->id;
+
+            //ToDo: poner bien la dirección total del componente de recuperar contraseña
+            $link = $this->FRONT_URI . '/' . $token;
+            Mail::to($user[0]->email)->send(new RecoverPassword($link));
+            return response([
+                'message' => 'Email enviado'
+            ]);
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
         }
     }
 }
