@@ -31,7 +31,7 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'required|string|max:20',
                 'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
@@ -46,7 +46,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'email' => 'required|email',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
             ]);
             $credentials = $request->only(['email', 'password']);
             if (!Auth::attempt($credentials)) {
@@ -79,7 +79,7 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'string|max:20',
                 'email' => 'email|unique:users',
-                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/'),
+                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/'),
                 'image_path' => 'string'
             ]);
             $body = $request->only(['name', 'email', 'password', 'image_path']);
@@ -101,7 +101,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:20',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,16}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
             ]);
             $user = Auth::user();
             $user->delete;
