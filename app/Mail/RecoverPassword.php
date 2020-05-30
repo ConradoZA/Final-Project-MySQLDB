@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ConfirmEmail extends Mailable
+class RecoverPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,6 +19,6 @@ class ConfirmEmail extends Mailable
 
     public function build()
     {
-        return $this->from('noreply@Play2Games.com')->view('emails.confirm-mail');
+        return $this->from('noreply@Play2Games.com')->view('emails.recover-password');
     }
 }

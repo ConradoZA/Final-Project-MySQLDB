@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ConfirmEmail;
+use App\Mail\RecoverPassword;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -111,7 +112,7 @@ class UserController extends Controller
             return $this->ERROR_MESSAGE($e, 'No se pudo borrar el usuario');
         }
     }
-    public function getProfile(Request $request)
+    public function getProfile()
     {
         try {
             $user = Auth::user();
@@ -145,9 +146,11 @@ class UserController extends Controller
     public function sendConfirmEmail()
     {
         try {
+            $token = Auth::user()->token()->get();
+            $token = $token[0]->id;
             //ToDo: poner bien la dirección total del componente de confirmar contraseña
-            $link = $FRONT_URI . '/' . Auth::token();
-            Mail::to(Auth::email())->send(new ConfirmEmail($link));
+            $link = $this->FRONT_URI . '/' . $token;
+            Mail::to(Auth::user()->email)->send(new ConfirmEmail($link));
             return response([
                 'message' => 'Email enviado'
             ]);
@@ -171,9 +174,21 @@ class UserController extends Controller
     public function sendRecoverPasswordEmail(Request $request)
     {
         try {
-            //ToDo: poner bien la dirección total del componente de confirmar contraseña
-            $link = $this->FRONT_URI . '/' . Auth::token();
-            Mail::to(Auth::email())->send(new ConfirmEmail($link));
+            $request->validate([
+                'name' => 'string|max:20',
+                'email' => 'email'
+            ]);
+            $body = $request->only(['name', 'email']);
+            $user = DB::table('users')->where([['name', $body['name']], ['email', $body['email']]])->get();
+            $token = DB::table('oauth_access_tokens')->where('user_id', $user[0]->id)->get();
+            $token = $token[0]->id;
+
+            //ToDo: poner bien la dirección total del componente de recuperar contraseña
+            $link = $this->FRONT_URI . '/' . $token;
+            Mail::to($user[0]->email)->send(new RecoverPassword($link));
+            return response([
+                'message' => 'Email enviado'
+            ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
         }

@@ -164,7 +164,7 @@
 													</tr>
 												</tbody>
 											</table>
-											<div align="center" class="img-container center fixedwidth" style="padding-right: 40px;padding-left: 40px;"><img align="center" alt="I'm an image" border="0" class="center fixedwidth" src="images/Img1_2x.jpg" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 352px; display: block;" title="I'm an image" width="352" />
+											<div align="center" class="img-container center fixedwidth" style="padding-right: 40px;padding-left: 40px;"><img align="center" alt="I'm an image" border="0" class="center fixedwidth" src="{{ asset('images/Img22x.jpg') }}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 352px; display: block;" title="I'm an image" width="352" />
 											</div>
 											<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
 												<tbody>
@@ -183,16 +183,16 @@
 											</table>
 											<div style="color:#555555;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;line-height:1.2;padding-top:10px;padding-right:40px;padding-bottom:10px;padding-left:40px;">
 												<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;">
-													<p style="font-size: 30px; line-height: 1.2; text-align: center; word-break: break-word; margin: 0;"><span style="font-size: 30px; color: #2b303a;"><strong>Verifica tu cuenta de correo</strong></span></p>
+													<p style="font-size: 30px; line-height: 1.2; text-align: center; word-break: break-word; margin: 0;"><span style="font-size: 30px; color: #2b303a;"><strong>Recupera tu contraseña</strong></span></p>
 												</div>
 											</div>
 											<div style="color:#555555;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;line-height:1.5;padding-top:10px;padding-right:40px;padding-bottom:10px;padding-left:40px;">
 												<div style="line-height: 1.5; font-size: 12px; font-family: Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif; color: #555555;">
-													<p style="font-size: 15px; line-height: 1.5; text-align: center; word-break: break-word; font-family: inherit; margin: 0;"><span style="color: #808389; font-size: 15px;">Por favor, verifica tu cuenta de correo haciendo click en el botón de abajo para que podamos enviarte información importante cuando sea necesario.</span></p>
+													<p style="font-size: 15px; line-height: 1.5; text-align: center; word-break: break-word; font-family: inherit; margin: 0;"><span style="color: #808389; font-size: 15px;">¿Te has olvidado de tu contraseña?<br>Para poder volver a entrar con tu usuario debes hacer click en el botón de abajo e introducir una nueva contraseña para tu cuenta.</span></p>
 												</div>
 											</div>
 											<div align="center" class="button-container" style="padding-top:15px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-												<div style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#1aa19c;border-radius:60px;-webkit-border-radius:60px;-moz-border-radius:60px;width:auto; width:auto;;border-top:1px solid #1aa19c;border-right:1px solid #1aa19c;border-bottom:1px solid #1aa19c;border-left:1px solid #1aa19c;padding-top:15px;padding-bottom:15px;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;text-align:center;word-break:keep-all;"><span style="padding-left:30px;padding-right:30px;font-size:16px;display:inline-block;"><a href={{$link}} style="font-size: 16px; margin: 0; line-height: 2; word-break: break-word; text-decoration: none;"><strong>Confirmar tu Email</strong></a></span></div>
+												<div style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#1aa19c;border-radius:60px;-webkit-border-radius:60px;-moz-border-radius:60px;width:auto; width:auto;;border-top:1px solid #1aa19c;border-right:1px solid #1aa19c;border-bottom:1px solid #1aa19c;border-left:1px solid #1aa19c;padding-top:15px;padding-bottom:15px;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;text-align:center;word-break:keep-all;"><span style="padding-left:30px;padding-right:30px;font-size:16px;display:inline-block;"><a href={{$link}} style="font-size: 16px; margin: 0; line-height: 2; word-break: break-word; text-decoration: none;"><strong>Nueva contraseña</strong></a></span></div>
 											</div>
 										</div>
 									</div>
