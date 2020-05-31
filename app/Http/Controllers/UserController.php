@@ -168,6 +168,8 @@ class UserController extends Controller
             return $this->ERROR_MESSAGE($e);
         }
     }
+
+    //ToDo: ya esta hecho con otro controlador
     public function sendRecoverPasswordEmail(Request $request)
     {
         try {
@@ -176,9 +178,7 @@ class UserController extends Controller
             ]);
             $body = $request->only('name');
             $user = DB::table('users')->where('name', $body['name'])->get();
-            return response($user[0]->id);
             $token = DB::table('oauth_access_tokens')->where('user_id', $user[0]->id)->get();
-            return response($token);
             $token = $token[0]->id;
 
             //ToDo: poner bien la dirección total del componente de recuperar contraseña

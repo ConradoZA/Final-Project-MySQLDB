@@ -24,10 +24,10 @@ class PasswordResetSuccess extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-        ->greeting('¡Felicidades!')
-        ->line('Has cambiado el password con éxito.');
-        // ->line('Si ya has cambiado el password, no necesitas hacer nada más.')
-        // ->line('Si todavía no has cambiado el password, hazlo y protege tu cuenta.');
+            ->subject('Contraseña recuperada con éxito')
+            ->greeting('¡Felicidades!')
+            ->line('Has cambiado el password con éxito.')
+            ->salutation('Saludos,');
     }
 
     public function toArray($notifiable)
