@@ -11,6 +11,13 @@ Route::prefix('v1')->group(function () {
     Route::prefix('users')->group(function () {
         Route::post('register', 'UserController@register');
         Route::post('login', 'UserController@login');
+        Route::post('recover-mail', 'UserController@sendRecoverPasswordEmail');
+
+        Route::prefix('password')->group(function () {
+            Route::post('forgotten', 'PasswordResetController@create');
+            Route::get('find/{token}', 'PasswordResetController@find');
+            Route::post('reset', 'PasswordResetController@reset');
+        });
 
         Route::middleware('auth:api')->group(function () {
             Route::get('', 'UserController@getProfile');
@@ -20,7 +27,8 @@ Route::prefix('v1')->group(function () {
             Route::post('upload', 'UserController@uploadImage');
             Route::get('confirm-mail', 'UserController@sendConfirmEmail');
             Route::get('mail-confirmed', 'UserController@mailConfirmed');
-            Route::post('recover-mail', 'UserController@sendRecoverPasswordEmail');
+
+            //ToDo: poner la función de encontrar usuario por el token y actualizar la contraseña
 
         });
     });

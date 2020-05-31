@@ -16,14 +16,11 @@ class UserController extends Controller
     public $FRONT_URI;
     public function __construct()
     {
-        $this->FRONT_URI = env('FRONT_URI', 'https:');
+        $this->FRONT_URI = env('FRONT_URI', 'http://localhost:3000');
     }
-    private function ERROR_MESSAGE($e, $message)
+    private function ERROR_MESSAGE($e)
     {
-        return response([
-            'message' => $message,
-            'error' => $e->getMessage()
-        ], 500);
+        return response($e->getMessage(), 500);
     }
     public function register(Request $request)
     {
@@ -31,14 +28,14 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'required|string|max:20',
                 'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
             $user = User::create($body);
             return response($user, 201);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'Hubo un error al crear el usuario');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function login(Request $request)
@@ -46,7 +43,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'email' => 'required|email',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
             ]);
             $credentials = $request->only(['email', 'password']);
             if (!Auth::attempt($credentials)) {
@@ -59,18 +56,18 @@ class UserController extends Controller
             $user->token = $token;
             return response($user);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'Hubo un error al conectarse');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function logout()
     {
         try {
-            Auth::user()->token()->delete();
+            Auth::user()->token()->revoke();
             return response([
                 'message' => 'Usuario desconectado'
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'Hubo un error al desconectarse');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function updateUser(Request $request)
@@ -78,22 +75,22 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name' => 'string|max:20',
-                'email' => 'email|unique:users',
-                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/'),
+                'email' => 'email',
+                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
                 'image_path' => 'string'
             ]);
+
             $body = $request->only(['name', 'email', 'password', 'image_path']);
-            if ($body['password']) {
+
+            if (array_key_exists('password', $body)) {
                 $body['password'] = Hash::make($body['password']);
             }
             $user = Auth::user();
-            $user->update($body);
-            return response([
-                'user' => $user,
-                'message' => 'Datos del usuario actualizados',
-            ]);
+            User::where('id', $user->id)->update($body);
+            $user = DB::table('users')->where('id', $user->id)->get();
+            return response($user);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'Hubo un error al actualizar los datos');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function deleteUser(Request $request)
@@ -101,7 +98,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:20',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!+*=@#$%^&])(?=.{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
             ]);
             $user = Auth::user();
             $user->delete;
@@ -109,7 +106,7 @@ class UserController extends Controller
                 'message' => 'Usuario borrado con éxito',
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo borrar el usuario');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function getProfile()
@@ -120,7 +117,7 @@ class UserController extends Controller
                 'user' => $user
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo acceder al usuario');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function uploadImage(Request $request)
@@ -140,7 +137,7 @@ class UserController extends Controller
                 'message' => 'Imagen subida con éxito'
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo subir la imagen');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function sendConfirmEmail()
@@ -155,7 +152,7 @@ class UserController extends Controller
                 'message' => 'Email enviado'
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function emalConfirmed()
@@ -168,19 +165,20 @@ class UserController extends Controller
                 'message' => 'Email verificado'
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo verificar el mail');
+            return $this->ERROR_MESSAGE($e);
         }
     }
     public function sendRecoverPasswordEmail(Request $request)
     {
         try {
             $request->validate([
-                'name' => 'string|max:20',
-                'email' => 'email'
+                'name' => 'string|max:20'
             ]);
-            $body = $request->only(['name', 'email']);
-            $user = DB::table('users')->where([['name', $body['name']], ['email', $body['email']]])->get();
+            $body = $request->only('name');
+            $user = DB::table('users')->where('name', $body['name'])->get();
+            return response($user[0]->id);
             $token = DB::table('oauth_access_tokens')->where('user_id', $user[0]->id)->get();
+            return response($token);
             $token = $token[0]->id;
 
             //ToDo: poner bien la dirección total del componente de recuperar contraseña
@@ -190,7 +188,7 @@ class UserController extends Controller
                 'message' => 'Email enviado'
             ]);
         } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e, 'No se pudo enviar el mail');
+            return $this->ERROR_MESSAGE($e);
         }
     }
 }
