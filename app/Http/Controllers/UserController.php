@@ -62,7 +62,7 @@ class UserController extends Controller
     public function logout()
     {
         try {
-            Auth::user()->token()->revoke();
+            Auth::user()->token()->delete();
             return response([
                 'message' => 'Usuario desconectado'
             ]);
@@ -120,6 +120,17 @@ class UserController extends Controller
             return $this->ERROR_MESSAGE($e);
         }
     }
+    public function getAll()
+    {
+        try {
+            $users = User::all();
+            return response([
+                'users' => $users
+            ]);
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e);
+        }
+    }
     public function uploadImage(Request $request)
     {
         try {
@@ -145,8 +156,7 @@ class UserController extends Controller
         try {
             $token = Auth::user()->token()->get();
             $token = $token[0]->id;
-            //ToDo: poner bien la dirección total del componente de confirmar contraseña
-            $link = $this->FRONT_URI . '/' . $token;
+            $link = $this->FRONT_URI . '/confirm/' . $token;
             Mail::to(Auth::user()->email)->send(new ConfirmEmail($link));
             return response([
                 'message' => 'Email enviado'
@@ -155,38 +165,23 @@ class UserController extends Controller
             return $this->ERROR_MESSAGE($e);
         }
     }
-    public function emalConfirmed()
-    {
-        try {
-            $user = Auth::user();
-            $user->update(['email_verified' => true]);
-            return response([
-                'user' => $user,
-                'message' => 'Email verificado'
-            ]);
-        } catch (\Exception $e) {
-            return $this->ERROR_MESSAGE($e);
-        }
-    }
-
-    //ToDo: ya esta hecho con otro controlador
-    public function sendRecoverPasswordEmail(Request $request)
+    public function mailConfirmed(Request $request)
     {
         try {
             $request->validate([
-                'name' => 'string|max:20'
+                'token' => 'required|string'
             ]);
-            $body = $request->only('name');
-            $user = DB::table('users')->where('name', $body['name'])->get();
-            $token = DB::table('oauth_access_tokens')->where('user_id', $user[0]->id)->get();
-            $token = $token[0]->id;
-
-            //ToDo: poner bien la dirección total del componente de recuperar contraseña
-            $link = $this->FRONT_URI . '/' . $token;
-            Mail::to($user[0]->email)->send(new RecoverPassword($link));
-            return response([
-                'message' => 'Email enviado'
-            ]);
+            $user = Auth::user();
+            $real_token = Auth::user()->token()->first();
+            $token = $request->token;
+            if (!$token === $real_token) {
+                return response([
+                    'message' => 'El token usado no es válido.'
+                ], 500);
+            }
+            User::where('id', $user->id)->update(["email_verified" => true]);
+            $user = DB::table('users')->where('id', $user->id)->get();
+            return response($user);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
         }

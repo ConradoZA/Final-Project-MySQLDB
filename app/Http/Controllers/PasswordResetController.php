@@ -73,15 +73,15 @@ class PasswordResetController extends Controller
             $body = $request->only(['password', 'token']);
             $passwordReset = PasswordReset::where('token', $body['token'])->first();
             if (!$passwordReset) {
-                return $this->WRONG_TOKEN;
+                return $this->WRONG_TOKEN();
             }
             if (Carbon::parse($passwordReset->updated_at)->addHours(12)->isPast()) {
                 $passwordReset->delete();
-                return $this->WRONG_TOKEN;
+                return $this->WRONG_TOKEN();
             }
             $user = User::where('email', $passwordReset->email)->first();
             if (!$user) {
-                return $this->WRONG_TOKEN;
+                return $this->WRONG_TOKEN();
             }
             $user->password = Hash::make($body['password']);
             User::where('email', $passwordReset->email)->update(["password" => $user->password]);

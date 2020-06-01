@@ -20,15 +20,13 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('auth:api')->group(function () {
             Route::get('', 'UserController@getProfile');
+            Route::get('all', 'UserController@getAll');
             Route::get('logout', 'UserController@logout');
             Route::put('update', 'UserController@updateUser');
             Route::delete('delete', 'UserController@deleteUser');
             Route::post('upload', 'UserController@uploadImage');
             Route::get('confirm-mail', 'UserController@sendConfirmEmail');
-            Route::get('mail-confirmed', 'UserController@mailConfirmed');
-
-            //ToDo: poner la función de encontrar usuario por el token y actualizar la contraseña
-
+            Route::post('mail-confirmed', 'UserController@mailConfirmed');
         });
     });
 });
