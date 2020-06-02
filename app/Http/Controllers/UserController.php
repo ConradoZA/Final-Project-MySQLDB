@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ConfirmEmail;
-use App\Mail\RecoverPassword;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -139,9 +139,15 @@ class UserController extends Controller
                 'image' => 'required|image|max:2048|unique:users,image_path'
             ]);
             $file = $request->file('image');
+            $user = Auth::user();
+            $uri_exists = Str::contains($user['image_path'], 'http');
+            if ($user['image_path'] && !$uri_exists) {
+                $image_path = public_path('images/' . $user->image_path);
+                unlink($image_path);
+            }
             $image_name = $file->getClientOriginalName();
             $file->move('images', $image_name);
-            $user = Auth::user();
+
             $user->update(['image_path' => $image_name]);
             return response([
                 'user' => $user,
