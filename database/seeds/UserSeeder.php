@@ -12,17 +12,20 @@ class UserSeeder extends Seeder
             [
                 'name' => 'User',
                 'email' => 'user@gmail.com',
-                'password' => Hash::make('123User+')
+                'password' => Hash::make('123User+'),
+                'image_path'=>'profile.jpg'
             ],
             [
                 'name' => 'Admin',
                 'email' => 'admin@gmail.com',
-                'password' => Hash::make('123Admin+')
+                'password' => Hash::make('123Admin+'),
+                'image_path'=>'profile.jpg'
             ],
             [
                 'name' => 'Another',
                 'email' => 'another@gmail.com',
-                'password' => Hash::make('123Another+')
+                'password' => Hash::make('123Another+'),
+                'image_path'=>'profile.jpg'
             ]
         ]);
     }

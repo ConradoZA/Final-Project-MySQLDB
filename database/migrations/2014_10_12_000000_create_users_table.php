@@ -12,7 +12,7 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('image_path')->nullable()->default("");
+            $table->string('image_path')->nullable()->default("profile.jpg");
             $table->boolean('email_verified')->nullable()->default(false);
             $table->string('password');
             $table->timestamps();
