@@ -28,7 +28,7 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'required|string|max:20',
                 'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
@@ -43,12 +43,12 @@ class UserController extends Controller
         try {
             $request->validate([
                 'email' => 'required|email',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
             ]);
             $credentials = $request->only(['email', 'password']);
             if (!Auth::attempt($credentials)) {
                 return response([
-                    'message' => 'Usuario o contraseña incorrectos'
+                    'message' => 'Usuario o contraseña incorrectos',
                 ], 400);
             }
             $user = Auth::user();
@@ -64,7 +64,7 @@ class UserController extends Controller
         try {
             Auth::user()->token()->delete();
             return response([
-                'message' => 'Usuario desconectado'
+                'message' => 'Usuario desconectado',
             ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
@@ -77,7 +77,7 @@ class UserController extends Controller
                 'name' => 'string|max:20',
                 'email' => 'email',
                 'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
-                'image_path' => 'string'
+                'image_path' => 'string',
             ]);
 
             $body = $request->only(['name', 'email', 'password', 'image_path']);
@@ -98,7 +98,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:20',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/')
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
             ]);
             $user = Auth::user();
             $user->delete;
@@ -114,7 +114,7 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             return response([
-                'user' => $user
+                'user' => $user,
             ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
@@ -125,7 +125,7 @@ class UserController extends Controller
         try {
             $users = User::all();
             return response([
-                'users' => $users
+                'users' => $users,
             ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
@@ -136,12 +136,12 @@ class UserController extends Controller
         try {
 
             $request->validate([
-                'image' => 'required|image|max:2048|unique:users,image_path'
+                'image' => 'required|image|max:2048|unique:users,image_path',
             ]);
             $file = $request->file('image');
             $user = Auth::user();
             $uri_exists = Str::contains($user['image_path'], 'http');
-            if ($user['image_path'] && !$uri_exists) {
+            if ($user['image_path'] && !$uri_exists && !$user['image_path'] === "profile.jpg") {
                 $image_path = public_path('images/' . $user->image_path);
                 unlink($image_path);
             }
@@ -151,7 +151,7 @@ class UserController extends Controller
             $user->update(['image_path' => $image_name]);
             return response([
                 'user' => $user,
-                'message' => 'Imagen subida con éxito'
+                'message' => 'Imagen subida con éxito',
             ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
@@ -165,7 +165,7 @@ class UserController extends Controller
             $link = $this->FRONT_URI . '/confirm/' . $token;
             Mail::to(Auth::user()->email)->send(new ConfirmEmail($link));
             return response([
-                'message' => 'Email enviado'
+                'message' => 'Email enviado',
             ]);
         } catch (\Exception $e) {
             return $this->ERROR_MESSAGE($e);
@@ -175,14 +175,14 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'token' => 'required|string'
+                'token' => 'required|string',
             ]);
             $user = Auth::user();
             $real_token = Auth::user()->token()->first();
             $token = $request->token;
             if (!$token === $real_token) {
                 return response([
-                    'message' => 'El token usado no es válido.'
+                    'message' => 'El token usado no es válido.',
                 ], 500);
             }
             User::where('id', $user->id)->update(["email_verified" => true]);
