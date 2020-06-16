@@ -32,6 +32,7 @@ class UserController extends Controller
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
+            $body['image_path'] = "profile.jpg";
             $user = User::create($body);
             return response($user, 201);
         } catch (\Exception $e) {
@@ -96,12 +97,8 @@ class UserController extends Controller
     public function deleteUser(Request $request)
     {
         try {
-            $request->validate([
-                'name' => 'required|string|max:20',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
-            ]);
             $user = Auth::user();
-            $user->delete;
+            $user->delete();
             return response([
                 'message' => 'Usuario borrado con éxito',
             ]);
@@ -141,8 +138,9 @@ class UserController extends Controller
             $file = $request->file('image');
             $user = Auth::user();
             $uri_exists = Str::contains($user['image_path'], 'http');
-            if ($user['image_path'] && !$uri_exists && !$user['image_path'] === "profile.jpg") {
-                $image_path = public_path('images/' . $user->image_path);
+            if ($user['image_path'] && !$uri_exists && $user['image_path'] !== "profile.jpg") {
+                //ToDo: En producción es posible que haya que poner public_path('images/' . $user->image_path)
+                $image_path = 'images/' . $user->image_path;
                 unlink($image_path);
             }
             $image_name = $file->getClientOriginalName();
