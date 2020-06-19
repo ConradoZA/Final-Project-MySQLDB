@@ -9,6 +9,7 @@ if($method == "OPTIONS") {
     die();
 }
 
+define('LARAVEL_START', microtime(true));
 
 /*
 |--------------------------------------------------------------------------
