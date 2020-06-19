@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -135,18 +136,13 @@ class UserController extends Controller
             $request->validate([
                 'image' => 'required|image|max:2048|unique:users,image_path',
             ]);
-            $file = $request->file('image');
+            $image_path = $request->image->store('images', 's3');
             $user = Auth::user();
             $uri_exists = Str::contains($user['image_path'], 'http');
-            if ($user['image_path'] && !$uri_exists && $user['image_path'] !== "profile.jpg") {
-                //ToDo: En producción es posible que haya que poner public_path('images/' . $user->image_path)
-                $image_path = 'images/' . $user->image_path;
-                unlink($image_path);
+            if ($user['image_path'] && !$uri_exists && $user['image_path'] !== "images/profile.jpg") {
+                Storage::disk('s3')->delete($user['image_path']);
             }
-            $image_name = $file->getClientOriginalName();
-            $file->move('images', $image_name);
-
-            $user->update(['image_path' => $image_name]);
+            $user->update(['image_path' => $image_path]);
             return response([
                 'user' => $user,
                 'message' => 'Imagen subida con éxito',
