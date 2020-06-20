@@ -2,14 +2,14 @@
 
 define('LARAVEL_START', microtime(true));
 
-header("Access-Control-Allow-Origin: https://play2games.herokuapp.com");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-header("Allow: GET, POST, OPTIONS, PUT, DELETE");
-$method = $_SERVER['REQUEST_METHOD'];
-if($method === "OPTIONS") {
-    die();
-}
+// header("Access-Control-Allow-Origin: https://play2games.herokuapp.com");
+// header("Access-Control-Allow-Headers: *");
+// header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+// header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+// $method = $_SERVER['REQUEST_METHOD'];
+// if($method === "OPTIONS") {
+//     die();
+// }
 
 /*
 |--------------------------------------------------------------------------
