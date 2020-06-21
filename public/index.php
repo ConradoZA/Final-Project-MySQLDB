@@ -2,14 +2,14 @@
 
 define('LARAVEL_START', microtime(true));
 
-// header("Access-Control-Allow-Origin: https://play2games.herokuapp.com");
-// header("Access-Control-Allow-Headers: *");
-// header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-// header("Allow: GET, POST, OPTIONS, PUT, DELETE");
-// $method = $_SERVER['REQUEST_METHOD'];
-// if($method === "OPTIONS") {
-//     die();
-// }
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method === "OPTIONS") {
+    exit;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +21,9 @@ define('LARAVEL_START', microtime(true));
 | into the script here so that we don't have to worry about manual
 | loading any of our classes later on. It feels great to relax.
 |
-*/
+ */
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -35,9 +35,9 @@ require __DIR__.'/../vendor/autoload.php';
 | will load up this application so that we can run it and send
 | the responses back to the browser and delight our users.
 |
-*/
+ */
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 | the client's browser allowing them to enjoy the creative
 | and wonderful application we have prepared for them.
 |
-*/
+ */
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
