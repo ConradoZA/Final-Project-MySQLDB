@@ -67,7 +67,7 @@ class PasswordResetController extends Controller
     {
         try {
             $request->validate([
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&]).{6,}$/'),
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?/`´:;çºª|"· ¬¡¿]).{6,}$/'),
                 'token' => 'required|string'
             ]);
             $body = $request->only(['password', 'token']);

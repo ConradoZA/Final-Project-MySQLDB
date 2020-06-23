@@ -10,9 +10,9 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('email')->unique();
-            $table->string('image_path')->nullable()->default("profile.jpg");
+            $table->string('image_path')->nullable()->default("images/profile.jpg");
             $table->boolean('email_verified')->nullable()->default(false);
             $table->string('password');
             $table->timestamps();
