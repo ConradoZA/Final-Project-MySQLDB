@@ -29,7 +29,7 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'required|string|max:20|unique:users',
                 'email' => 'required|email|unique:users',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?/`´:;çºª|"· ¬¡¿]).{6,}$/'),
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?`´:;çºª|· ¬¡¿]).{6,}$/'),
             ]);
             $body = $request->only(['name', 'email', 'password']);
             $body['password'] = Hash::make($body['password']);
@@ -45,7 +45,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'email' => 'required|email',
-                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?/`´:;çºª|"· ¬¡¿]).{6,}$/'),
+                'password' => array('required', 'string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?`´:;çºª|· ¬¡¿]).{6,}$/'),
             ]);
             $credentials = $request->only(['email', 'password']);
             if (!Auth::attempt($credentials)) {
@@ -78,7 +78,7 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'string|max:20|unique:users',
                 'email' => 'email',
-                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?/`´:;çºª|"· ¬¡¿]).{6,}$/'),
+                'password' => array('string', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[#$^+=!*()@%&.,_?`´:;çºª|· ¬¡¿]).{6,}$/'),
                 'image_path' => 'string',
             ]);
 
@@ -136,13 +136,13 @@ class UserController extends Controller
             $request->validate([
                 'image' => 'required|image|max:2048|unique:users,image_path',
             ]);
-            $image_path = $request->image->storeAs('images', $request->image->getClientOriginalName(), 's3');
+            $image_path = $request->image->storeAs('images', $request->file('image')->getClientOriginalName(), 's3');
             $user = Auth::user();
             $uri_exists = Str::contains($user['image_path'], 'http');
             if ($user['image_path'] && !$uri_exists && $user['image_path'] !== "images/profile.jpg") {
                 Storage::disk('s3')->delete($user['image_path']);
             }
-            // $user->update(['image_path' => $image_path]);
+            $user->update(['image_path' => $image_path]);
             return response([
                 'user' => $user,
                 'message' => 'Imagen subida con éxito',
