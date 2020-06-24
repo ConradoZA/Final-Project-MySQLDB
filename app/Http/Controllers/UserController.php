@@ -129,6 +129,15 @@ class UserController extends Controller
             return $this->ERROR_MESSAGE($e);
         }
     }
+    public function getOne(Request $request, $name)
+    {
+        try {
+            $user = User::where("name", $name)->get();
+            return $user[0];
+        } catch (\Exception $e) {
+            return $this->ERROR_MESSAGE($e);
+        }
+    }
     public function uploadImage(Request $request)
     {
         try {

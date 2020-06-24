@@ -21,6 +21,7 @@ Route::prefix('/v1')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::get('/', 'UserController@getProfile');
             Route::get('/all', 'UserController@getAll');
+            Route::get('/one={name}', 'UserController@getOne');
             Route::get('/logout', 'UserController@logout');
             Route::put('/update', 'UserController@updateUser');
             Route::delete('/delete', 'UserController@deleteUser');
